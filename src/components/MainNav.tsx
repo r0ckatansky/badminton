@@ -12,7 +12,7 @@ export default function MainNav() {
   return (
     <div className="mr-4 hidden md:flex">
       <nav className="flex items-center gap-6 text-sm">
-        <h1>Tournois de Badminton</h1>
+        <h1 className="m-2">Tournois de Badminton</h1>
       {/* <Link to="/test"
           className={cn(
             "transition-colors hover:text-foreground/80",
