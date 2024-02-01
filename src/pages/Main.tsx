@@ -36,15 +36,22 @@ export default function Main() {
   const [ niveau, setNiveau ] = useState<string>("0")
 
   const handleclickjoueur = () => {
-    // ouvre une fenetre pour ajouter un joueur
-    setJoueurs([...joueurs, {nom: nom, sexe: sexe, niveau: niveau}])
+    // il faut ajouter le joueurs dans le local storage
+    // let liste_localstorage = localStorage.getItem('joueurs')
+    // if (liste_localstorage !== null) {
+    //   liste_localstorage = JSON.stringify({nom: nom, sexe: sexe, niveau: niveau})
+    // }else{
 
-    // il faut ajouter le joueurs dans le local storage 
-    localStorage.setItem('joueurs', JSON.stringify(joueurs))
-    console.log(joueurs)  
+    // }
+    localStorage.getItem('joueurs') === null ? localStorage.setItem('joueurs', ""+JSON.stringify([{nom: nom, sexe: sexe, niveau: niveau}])) : localStorage.setItem('joueurs', localStorage.getItem('joueurs') + JSON.stringify({nom: nom, sexe: sexe, niveau: niveau}))
+    
+    
+    // setJoueurs([...joueurs, {nom: nom, sexe: sexe, niveau: niveau}])
+
   }
 
   return (
+    <>
     <div className="grid grid-cols-3">
         <div className="h-[100%] border-2 text-center ">
             <div className="grid grid-cols-2">
@@ -112,9 +119,11 @@ export default function Main() {
                   </AlertDialogContent>
                 </AlertDialog>
             </div>
-          {joueurs.map((joueur, index) => (
+
+
+          {/* { localStorage.getItem('joueurs') !== null  && localStorage.getItem('joueurs')?.map((joueur, index) => (
             <p key={index} className="my-auto">{joueur.nom}, {joueur.sexe === "0" ? " Femme de" : " Homme de "} niveau {joueur.niveau}</p>
-          ))}
+          ))} */}
 
 
         </div>
@@ -127,6 +136,11 @@ export default function Main() {
 
         </div>
     </div>
+    <div>
+      <Button onClick={ () => console.log(localStorage.getItem('joueurs'))}>test</Button>
+      <Button onClick={ () => localStorage.removeItem('joueurs')}>effacer le stockage</Button>
+    </div>
+    </>
   );
 }
 
