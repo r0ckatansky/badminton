@@ -1,6 +1,6 @@
 // page d'acceuil
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "src/components/import_shadcn/button";
 // import { Input } from "src/components/import_shadcn/input";
 
@@ -18,40 +18,111 @@ import {
 import { Label } from "src/components/import_shadcn/label";
 import { Input } from "src/components/import_shadcn/input";
 import { RadioGroup, RadioGroupItem } from "src/components/import_shadcn/radio-group";
+import { set } from "react-hook-form";
+import { loadavg } from "os";
 
 
 export default function Main() {  
 
+ 
   interface Joueur {
+    id: string;
     nom: string;
     sexe: string;
     niveau: string;
   }
   // liste des joueurs
   const [ joueurs, setJoueurs ] = useState<Joueur[]>([])
-  const nbjoueurs = joueurs.length
 
   const [ nom, setNom ] = useState<string>("")
   const [ sexe, setSexe ] = useState<string>("")
   const [ niveau, setNiveau ] = useState<string>("0")
 
-  const handleclickjoueur = () => {
-    // il faut ajouter le joueurs dans le local storage
-    // let liste_localstorage = localStorage.getItem('joueurs')
-    // if (liste_localstorage !== null) {
-    //   liste_localstorage = JSON.stringify({nom: nom, sexe: sexe, niveau: niveau})
-    // }else{
+  const wipe = () => {
 
-    // }
-    localStorage.getItem('joueurs') === null ? localStorage.setItem('joueurs', ""+JSON.stringify([{nom: nom, sexe: sexe, niveau: niveau}])) : localStorage.setItem('joueurs', localStorage.getItem('joueurs') + JSON.stringify({nom: nom, sexe: sexe, niveau: niveau}))
-    
-    
-    // setJoueurs([...joueurs, {nom: nom, sexe: sexe, niveau: niveau}])
+      // ajouter le joueur dans la liste des joueurs
+      const x = parseInt(localStorage.getItem('compteur_joueur') ?? "0",10)
+
+      for (let i = 1; i < x+1; i++) {
+        localStorage.removeItem('joueur_' + i)
+        console.log("je remove le joueur " + i)
+      }
+
+      localStorage.removeItem('compteur_joueur')
+
+      peuple()
+
 
   }
 
-  return (
-    <>
+
+  const affiche_tout = () => {
+  
+    const x = parseInt(localStorage.getItem('compteur_joueur') ?? "0",10)
+
+    console.log("compteur de joueurs : " + x)
+
+    for (let i = 1; i < x+1; i++) {
+      console.log(localStorage.getItem('joueur_' + i))
+    }
+  
+  }
+
+  const peuple = () => {
+    // ajouter le joueur dans la liste des joueurs
+    const x = parseInt(localStorage.getItem('compteur_joueur') ?? "0",10)
+
+    
+    setJoueurs([])
+    
+      for (let i = 1; i < x+1; i++) {
+        const joueur = localStorage.getItem('joueur_' + i)
+        console.log(joueur)
+        if (joueur !== null) {
+          const joueur_split = joueur.split(" ")
+          const joueur_obj = {id: joueur_split[1], nom: joueur_split[2], sexe: joueur_split[3], niveau: joueur_split[4]}
+          setJoueurs([...joueurs, joueur_obj])
+        }
+      }
+  }
+  
+  const suppr_joueur = (index: number) => {
+    console.log("je supprime le joueur " + index)
+    localStorage.removeItem('joueur_' + index)
+    peuple()
+  }
+
+  const handleclickjoueur = async () => {
+
+    // incrementer le compteur de joueurs dans le local storage
+    await localStorage.setItem('compteur_joueur', JSON.stringify(parseInt(localStorage.getItem('compteur_joueur') ?? "0",10)+1))
+    
+    // ajouter le joueur dans le local storage
+    await localStorage.setItem("joueur_" + localStorage.getItem('compteur_joueur') ?? "0", JSON.stringify(" "+localStorage.getItem('compteur_joueur')+" "+nom +" "+niveau+" "+sexe + " "))
+
+    // ajouter le joueur dans la liste des joueurs
+    peuple()
+  }
+
+
+
+        
+  const affiche_joueurs = () => {
+    return (
+      <div>
+        {joueurs.map((joueur, index) => (
+          <div className="grid grid-cols-2" key={index}>
+            <p> id: {joueur.id} ,{joueur.nom}, {joueur.sexe === "0" ? "femme" : "homme"} de niveau {joueur.niveau}</p>
+            <Button onClick={() => suppr_joueur(Number(joueur.id))}>Supprimer</Button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+  
+
+    return (
+      <>
     <div className="grid grid-cols-3">
         <div className="h-[100%] border-2 text-center ">
             <div className="grid grid-cols-2">
@@ -121,9 +192,7 @@ export default function Main() {
             </div>
 
 
-          {/* { localStorage.getItem('joueurs') !== null  && localStorage.getItem('joueurs')?.map((joueur, index) => (
-            <p key={index} className="my-auto">{joueur.nom}, {joueur.sexe === "0" ? " Femme de" : " Homme de "} niveau {joueur.niveau}</p>
-          ))} */}
+          {affiche_joueurs()}
 
 
         </div>
@@ -137,8 +206,8 @@ export default function Main() {
         </div>
     </div>
     <div>
-      <Button onClick={ () => console.log(localStorage.getItem('joueurs'))}>test</Button>
-      <Button onClick={ () => localStorage.removeItem('joueurs')}>effacer le stockage</Button>
+      <Button className="m-2" onClick={ () => affiche_tout()}>test</Button>
+      <Button className="m-2"onClick={ () => wipe() }>effacer le stockage</Button>
     </div>
     </>
   );
