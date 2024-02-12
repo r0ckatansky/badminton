@@ -1,12 +1,5 @@
 "use client"
 
-import * as React from "react"
-import { Link } from 'react-router-dom';
-
-
-import { cn } from "../lib/utils"
-import { Button } from "./import_shadcn/button";
-
 export default function MainNav() {
 
   return (

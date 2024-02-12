@@ -1,6 +1,4 @@
 import  MainNav  from "./MainNav"
-import { ModeToggle } from "./ModeToggle"
-import { useState } from "react"
 
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons"
 
