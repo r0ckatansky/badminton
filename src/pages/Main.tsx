@@ -1,6 +1,6 @@
 // page d'acceuil
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "src/components/import_shadcn/button";
 // import { Input } from "src/components/import_shadcn/input";
 
@@ -37,9 +37,6 @@ export default function Main() {
   const [ sexe, setSexe ] = useState<string>("")
   const [ niveau, setNiveau ] = useState<string>("0")
 
-  useEffect(() => {
-    peuple();
-  }, []); // Empty dependency array means this effect runs once on mount
 
 
   const handleenvoie = () => {
@@ -68,8 +65,8 @@ export default function Main() {
     for (let i=0;i<liste.length+1;i++){
       
       if (liste[i] === "x"){
-        console.log("j'ai trouvé un x à l'endroit : "+ i)
-        liste[i]= "(_" + i + "_"+ nom + "_"+ niveau + "_"+ sexe + "_"+ ")"
+        // console.log("j'ai trouvé un x à l'endroit : "+ i)
+        liste[i]= `(_ ${i} _ ${nom} _ ${niveau} _ ${sexe} + _+ `
         i=liste.length+1
       }
     };
@@ -82,22 +79,30 @@ export default function Main() {
   }
 
     // fonction qui met a jour la liste local par rapport au local storage
-    const peuple = () => {
-    let string  =  localStorage.getItem("listeJoueur") ?? "";
-    let liste = string.split(" ");
+    const peuple = useCallback(() => {
+      let string  =  localStorage.getItem("listeJoueur") ?? "";
+      let liste = string.split(" ");
+      
+      let newJoueurs: Joueur[] = [];
     
-    let newJoueurs: Joueur[] = [];
+      for (let i=0;i<liste.length-1;i++){
+        if (liste[i] !== "x"){
+          let joueur = liste[i].split("_")
+          const joueur_obj = {id: joueur[1], nom: joueur[2], sexe: joueur[4], niveau: joueur[3]}
+          newJoueurs.push(joueur_obj);
+        }
+      };
+    
+      setJoueurs(newJoueurs);
+    }, []); // add dependencies if any
+
+    useEffect(() => {
+      peuple();
+    }, [peuple]); // Empty dependency array means this effect runs once on mount
   
-    for (let i=0;i<liste.length-1;i++){
-      if (liste[i] !== "x"){
-        let joueur = liste[i].split("_")
-        const joueur_obj = {id: joueur[1], nom: joueur[2], sexe: joueur[4], niveau: joueur[3]}
-        newJoueurs.push(joueur_obj);
-      }
-    };
-  
-    setJoueurs(newJoueurs);
-  }
+  //   const peuple = () => {
+
+  // }
  
 
   
