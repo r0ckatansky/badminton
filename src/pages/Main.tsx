@@ -18,8 +18,7 @@ import {
 import { Label } from "src/components/import_shadcn/label";
 import { Input } from "src/components/import_shadcn/input";
 import { RadioGroup, RadioGroupItem } from "src/components/import_shadcn/radio-group";
-import { set } from "react-hook-form";
-import { loadavg } from "os";
+
 
 
 export default function Main() {  
@@ -38,71 +37,92 @@ export default function Main() {
   const [ sexe, setSexe ] = useState<string>("")
   const [ niveau, setNiveau ] = useState<string>("0")
 
-  const wipe = () => {
-
-      // ajouter le joueur dans la liste des joueurs
-      const x = parseInt(localStorage.getItem('compteur_joueur') ?? "0",10)
-
-      for (let i = 1; i < x+1; i++) {
-        localStorage.removeItem('joueur_' + i)
-        console.log("je remove le joueur " + i)
-      }
-
-      localStorage.removeItem('compteur_joueur')
-
-      peuple()
+  useEffect(() => {
+    peuple();
+  }, []); // Empty dependency array means this effect runs once on mount
 
 
+  const handleenvoie = () => {
+    EnvoieJoueur()
   }
 
 
   const affiche_tout = () => {
-  
-    const x = parseInt(localStorage.getItem('compteur_joueur') ?? "0",10)
-
-    console.log("compteur de joueurs : " + x)
-
-    for (let i = 1; i < x+1; i++) {
-      console.log(localStorage.getItem('joueur_' + i))
-    }
-  
+    let string  = localStorage.getItem("listeJoueur") ?? "";
+    console.log(string)
+    
   }
 
-  const peuple = () => {
-    // ajouter le joueur dans la liste des joueurs
-    const x = parseInt(localStorage.getItem('compteur_joueur') ?? "0",10)
+  const initie = () => {
+    localStorage.setItem("listeJoueur", "x x x x x x x x x x x x x x x x x x x x")
+  }
+
+  const EnvoieJoueur =  () => {
+    let string  =  localStorage.getItem("listeJoueur") ?? "";
+    // console.log(string)
 
     
-    setJoueurs([])
-    
-      for (let i = 1; i < x+1; i++) {
-        const joueur = localStorage.getItem('joueur_' + i)
-        console.log(joueur)
-        if (joueur !== null) {
-          const joueur_split = joueur.split(" ")
-          const joueur_obj = {id: joueur_split[1], nom: joueur_split[2], sexe: joueur_split[3], niveau: joueur_split[4]}
-          setJoueurs([...joueurs, joueur_obj])
-        }
+    let liste = string.split(" ");
+
+
+    for (let i=0;i<liste.length+1;i++){
+      
+      if (liste[i] === "x"){
+        console.log("j'ai trouvé un x à l'endroit : "+ i)
+        liste[i]= "(_" + i + "_"+ nom + "_"+ niveau + "_"+ sexe + "_"+ ")"
+        i=liste.length+1
       }
+    };
+
+    let string2 = liste.join(" ")
+    // console.log("la liste finale ")
+    // console.log(string2)
+    localStorage.setItem("listeJoueur",string2)
+    peuple()
   }
+
+    // fonction qui met a jour la liste local par rapport au local storage
+    const peuple = () => {
+    let string  =  localStorage.getItem("listeJoueur") ?? "";
+    let liste = string.split(" ");
+    
+    let newJoueurs: Joueur[] = [];
+  
+    for (let i=0;i<liste.length-1;i++){
+      if (liste[i] !== "x"){
+        let joueur = liste[i].split("_")
+        const joueur_obj = {id: joueur[1], nom: joueur[2], sexe: joueur[4], niveau: joueur[3]}
+        newJoueurs.push(joueur_obj);
+      }
+    };
+  
+    setJoueurs(newJoueurs);
+  }
+ 
+
   
   const suppr_joueur = (index: number) => {
-    console.log("je supprime le joueur " + index)
-    localStorage.removeItem('joueur_' + index)
-    peuple()
-  }
+    let string  =  localStorage.getItem("listeJoueur") ?? "";
+    // console.log(string)
 
-  const handleclickjoueur = async () => {
-
-    // incrementer le compteur de joueurs dans le local storage
-    await localStorage.setItem('compteur_joueur', JSON.stringify(parseInt(localStorage.getItem('compteur_joueur') ?? "0",10)+1))
     
-    // ajouter le joueur dans le local storage
-    await localStorage.setItem("joueur_" + localStorage.getItem('compteur_joueur') ?? "0", JSON.stringify(" "+localStorage.getItem('compteur_joueur')+" "+nom +" "+niveau+" "+sexe + " "))
+    let liste = string.split(" ");
 
-    // ajouter le joueur dans la liste des joueurs
+
+      
+    if (liste[index] !== "x"){
+      console.log("j'ai trouvé un celui que je retire à l'endroit ")
+      liste[index]= "x"
+    }
+    
+
+    let string2 = liste.join(" ")
+    // console.log("la liste finale ")
+    // console.log(string2)
+    localStorage.setItem("listeJoueur",string2)
     peuple()
   }
+
 
 
 
@@ -112,7 +132,7 @@ export default function Main() {
       <div>
         {joueurs.map((joueur, index) => (
           <div className="grid grid-cols-2" key={index}>
-            <p> id: {joueur.id} ,{joueur.nom}, {joueur.sexe === "0" ? "femme" : "homme"} de niveau {joueur.niveau}</p>
+            <p> <div className="text-bold">{joueur.nom}</div>, {joueur.sexe === "0" ? "femme" : "homme"} de niveau {joueur.niveau}</p>
             <Button onClick={() => suppr_joueur(Number(joueur.id))}>Supprimer</Button>
           </div>
         ))}
@@ -185,15 +205,13 @@ export default function Main() {
 
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleclickjoueur} >Ajouter le joueur</AlertDialogAction>
+                      <AlertDialogAction onClick={() => handleenvoie()} >Ajouter le joueur</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
             </div>
 
-
-          {affiche_joueurs()}
-
+            {affiche_joueurs()  }
 
         </div>
         <div className="h-[100%] border-2">
@@ -207,7 +225,11 @@ export default function Main() {
     </div>
     <div>
       <Button className="m-2" onClick={ () => affiche_tout()}>test</Button>
-      <Button className="m-2"onClick={ () => wipe() }>effacer le stockage</Button>
+      <Button className="m-2" onClick={ () => EnvoieJoueur()}>EnvoieJoueur</Button>
+      <Button className="m-2" onClick={ () => initie()}>initie</Button>
+
+      
+      {/* <Button className="m-2"onClick={ () => wipe() }>effacer le stockage</Button> */}
     </div>
     </>
   );
