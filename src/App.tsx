@@ -36,7 +36,7 @@ function App() {
         <Header onClick={toggleDarkMode} />
         <Toaster />
         <Routes>
-          <Route path="/badminton" element={<Main />} />
+          <Route path="/" element={<Main />} />
         </Routes>
       </BrowserRouter>
     </div>
