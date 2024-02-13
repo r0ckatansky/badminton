@@ -29,6 +29,7 @@ export default function Main() {
     nom: string;
     sexe: string;
     niveau: string;
+    score: string;
   }
   // liste des joueurs
   const [ joueurs, setJoueurs ] = useState<Joueur[]>([])
@@ -36,6 +37,7 @@ export default function Main() {
   const [ nom, setNom ] = useState<string>("")
   const [ sexe, setSexe ] = useState<string>("")
   const [ niveau, setNiveau ] = useState<string>("0")
+  const [ score, setScore ] = useState<string>("0")
 
 
 
@@ -66,7 +68,7 @@ export default function Main() {
       
       if (liste[i] === "x"){
         // console.log("j'ai trouvé un x à l'endroit : "+ i)
-        liste[i]= `(_ ${i} _ ${nom} _ ${niveau} _ ${sexe} + _+ `
+        liste[i]= `(_${i}_${nom}_${niveau}_${sexe}_${score})`
         i=liste.length+1
       }
     };
@@ -88,7 +90,7 @@ export default function Main() {
       for (let i=0;i<liste.length-1;i++){
         if (liste[i] !== "x"){
           let joueur = liste[i].split("_")
-          const joueur_obj = {id: joueur[1], nom: joueur[2], sexe: joueur[4], niveau: joueur[3]}
+          const joueur_obj = {id: joueur[1], nom: joueur[2], sexe: joueur[4], niveau: joueur[3], score: joueur[5]}
           newJoueurs.push(joueur_obj);
         }
       };
